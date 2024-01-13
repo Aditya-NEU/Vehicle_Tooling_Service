@@ -9,6 +9,7 @@
   "author": "Aditya Deshpande",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "moment-timezone": "^0.5.44"
   }
 }

@@ -122,6 +122,7 @@ app.get('/tollWithLocation/:id', (req, res) => {
 });
 
 // Example endpoint: Retrieve all toll records with details
+
 app.get('/allTollRecords', (req, res) => {
   const allTollRecords = Array.from(tollData.values());
 
