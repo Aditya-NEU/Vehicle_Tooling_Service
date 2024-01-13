@@ -6,7 +6,6 @@ const port = 3000;
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-
 require("./routes/routes")(app)
 
 
