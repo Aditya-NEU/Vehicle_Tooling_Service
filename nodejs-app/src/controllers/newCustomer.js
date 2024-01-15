@@ -15,29 +15,34 @@ postNewCustomer = async (req, res) => {
 
   const { name, licensePlate, tollTag } = req.body;
   const customerId = uuidv4();
-  
+
   const customerRecords = {
-    id: customerId,
+    customerId: customerId,
     name,
     licensePlate,
     tollTag
   }
 
   if (licensePlateToCustomerId.has(licensePlate) || tollTagToCustomerId.has(tollTag)) {
-      return res.status(400).json({
-        error: `Toll Tag is linked to another License Plate`
-      })
+    return res.status(400).json({
+      error: `Toll Tag is linked to another License Plate`
+    })
   }
 
   // Check if licensePlate and tollTag and name are provided
   if (!licensePlate || !tollTag || !name) {
-    return res.status(400).json({ error: 'License Plate and Toll Tag and Name are required' });
+    return res.status(400).json({ error: 'License Plate, Toll Tag and Name are required' });
   }
 
   customerData.set(customerId, customerRecords)
   licensePlateToCustomerId.set(licensePlate, customerId)
   tollTagToCustomerId.set(tollTag, customerId)
-  res.status(200).json({ id: customerId });
+  res.status(200).json({ 
+    customerId: customerId,
+    name: name,
+    licensePlate: licensePlate,
+    tollTag:tollTag
+  });
 
 }
 

@@ -1,30 +1,35 @@
 const { tollData } = require("./postToll");
-const customerModule = require("./newCustomer");
 const moment = require('moment-timezone');
+const locationCodeToName = require("./postToll");
 
 
 totalVehiclesLastMonth = async (req, res) => {
-  // Get the current date
-  const currentDate = moment();
 
-  // Calculate the start date of the last calendar month
-  const startDateLastMonth = currentDate.clone().subtract(1, 'months').startOf('month');
+  const lastMonthStart = moment().subtract(1, 'month').startOf('month');
+  const lastMonthEnd = moment().subtract(1, 'month').endOf('month');
 
   // Filter toll records for the last calendar month
-  const tollRecordsLastMonth = Array.from(tollData.values()).filter(
-    (record) => {
-      const recordDate = moment(record.timestamp);
-      return recordDate.isSameOrAfter(startDateLastMonth) && recordDate.isBefore(currentDate);
-    }
-  );
+  const tollRecordsLastMonth = Array.from(tollData.values()).filter((record) => {
+    const recordDate = moment(record.timestamp).utcOffset(record.timestamp).format('YYYY-MM-DD');
+    return moment(recordDate).isBetween(lastMonthStart, lastMonthEnd, null, '[]');
+  });
 
-  // Calculate the total count
-  const totalCount = tollRecordsLastMonth.length;
+  // Map toll bridge location codes to long form names
+  const tollRecordsWithLongForm = tollRecordsLastMonth.map((record) => ({
+    licensePlate: record.licensePlate,
+    tollTag: record.tollTag,
+    location: locationCodeToName.locationCodeToName[record.location],
+    timestamp: moment(record.timestamp).tz('America/Los_Angeles').format(),
+  }));
 
-  res.json({ totalCount });
+  // Respond with the total count and detailed toll records
+  res.status(200).json({
+    totalCount: tollRecordsLastMonth.length,
+    tollRecords: tollRecordsWithLongForm,
+  });
+
 }
 
-
-module.exports= {
-    totalVehiclesLastMonth
+module.exports = {
+  totalVehiclesLastMonth
 }
