@@ -4,15 +4,19 @@ const locationCodeToName = require ("./postToll")
 
 
 totalVehiclesByBridge = async (req, res) => {
-  const { bridge, date } = req.query;
+
+  try{
+    const { bridge, date } = req.query;
 
     // Check if the date parameter has the correct format
     const validDateFormat = /^\d{4}-\d{2}-\d{2}$/;
     if (!validDateFormat.test(date)) {
+      console.log('Error: Invalid date format. It should be in the format "YYYY-MM-DD"');
       return res.status(400).json({ error: 'Invalid date format. It should be in the format "YYYY-MM-DD"' });
     }  
 
   if (!bridge || !date) {
+    console.log('Error: Both bridge and date parameters are required');
     return res.status(400).json({ error: 'Both bridge and date parameters are required' });
   }
 
@@ -33,12 +37,22 @@ totalVehiclesByBridge = async (req, res) => {
     timestamp: moment(record.timestamp).tz('America/Los_Angeles').format(),
   }));
 
+  console.log(`Total vehicles passed through ${bridge} bridge on ${formattedDate}: ${tollRecordsForBridgeAndDate.length}`);
+  console.log(`Detailed toll records: ${JSON.stringify(tollRecordsWithLongForm)}`);
+
   const totalCount = tollRecordsForBridgeAndDate.length;
   res.status(200).json({ 
     totalCount,
     tollRecords: tollRecordsWithLongForm 
   
   });
+  }
+
+  catch{
+    console.error(`An error occurred in totalVehiclesByBridge endpoint: ${error.message}`);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+
 
 }
 

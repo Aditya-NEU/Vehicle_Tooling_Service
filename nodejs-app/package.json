@@ -4,17 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Aditya Deshpande",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
     "moment-timezone": "^0.5.44",
+    "supertest": "^6.3.4",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "chai": "^5.0.0",
-    "mocha": "^10.2.0"
+    "chai": "^4.3.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.2.1"
   }
 }

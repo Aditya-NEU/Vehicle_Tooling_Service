@@ -13,36 +13,59 @@ const tollTagToCustomerId = new Map();
 
 postNewCustomer = async (req, res) => {
 
-  const { name, licensePlate, tollTag } = req.body;
-  const customerId = uuidv4();
+  try{
 
-  const customerRecords = {
-    customerId: customerId,
-    name,
-    licensePlate,
-    tollTag
+    const { name, licensePlate, tollTag } = req.body;
+    const customerId = uuidv4();
+
+    console.log(`Received POST request for creating a new customer: ${JSON.stringify(req.body)}`);
+  
+    const customerRecords = {
+      customerId: customerId,
+      name,
+      licensePlate,
+      tollTag
+    }
+  
+    if (licensePlateToCustomerId.has(licensePlate) || tollTagToCustomerId.has(tollTag)) {
+      console.log(`Error: Toll Tag ${tollTag} is linked to another License Plate`);
+      return res.status(400).json({
+        error: `Toll Tag is linked to another License Plate`
+      })
+    }
+  
+    // Check if licensePlate and tollTag and name are provided
+    if (!licensePlate || !tollTag || !name) {
+      console.log('Error: License Plate, Toll Tag, and Name are required');
+      return res.status(400).json({ error: 'License Plate, Toll Tag and Name are required' });
+    }
+  
+    // Log customer data before storing
+    console.log(`Storing new customer data: ${JSON.stringify(customerRecords)}`);
+
+    customerData.set(customerId, customerRecords)
+    licensePlateToCustomerId.set(licensePlate, customerId)
+    tollTagToCustomerId.set(tollTag, customerId)
+
+
+    console.log(`New customer data successfully stored. Responding with customer details.`);
+
+    res.status(200).json({ 
+      customerId: customerId,
+      name: name,
+      licensePlate: licensePlate,
+      tollTag:tollTag
+    });
+
+
   }
 
-  if (licensePlateToCustomerId.has(licensePlate) || tollTagToCustomerId.has(tollTag)) {
-    return res.status(400).json({
-      error: `Toll Tag is linked to another License Plate`
-    })
+  catch{
+    console.error(`An error occurred in postNewCustomer endpoint: ${error.message}`);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 
-  // Check if licensePlate and tollTag and name are provided
-  if (!licensePlate || !tollTag || !name) {
-    return res.status(400).json({ error: 'License Plate, Toll Tag and Name are required' });
-  }
 
-  customerData.set(customerId, customerRecords)
-  licensePlateToCustomerId.set(licensePlate, customerId)
-  tollTagToCustomerId.set(tollTag, customerId)
-  res.status(200).json({ 
-    customerId: customerId,
-    name: name,
-    licensePlate: licensePlate,
-    tollTag:tollTag
-  });
 
 }
 

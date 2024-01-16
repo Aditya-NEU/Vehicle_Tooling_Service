@@ -15,7 +15,12 @@ const locationCodeToName = {
 };
 
 const postNewToll = async (req, res) => {
+
+try{
+
   const { licensePlate, tollTag, location, timestamp } = req.body;
+
+  console.log(`Received POST request for new toll: ${JSON.stringify(req.body)}`);
 
     // Check if location is valid
     if (!locationCodeToName[location]) {
@@ -38,7 +43,10 @@ const postNewToll = async (req, res) => {
     timestamp
   };
 
+  console.log(`Storing new toll record data: ${JSON.stringify(tollRecord)}`);
+
   if (!timestamp || !location || !licensePlate && !tollTag) {
+    console.log('Error: Timestamp and Location are required fields.');
     return res.status(400).json({ error: 'Timestamp and Location are required field.' });
   }
 
@@ -66,6 +74,7 @@ const postNewToll = async (req, res) => {
     }
 
     else {
+      console.log(`Error: License plate ${licensePlate} is not registered with this ${tollTag} Toll Tag.`);
       return res.status(400).json({
         error: `License plate ${licensePlate} is not registered with this ${tollTag} Toll Tag.`,
       });
@@ -81,8 +90,9 @@ const postNewToll = async (req, res) => {
   }
 
   if (customerModule.licensePlateToCustomerId.has(licensePlate) && tollTag == undefined || customerModule.tollTagToCustomerId.has(tollTag) && licensePlate == undefined) {
-    // Use the UUID as the key for the Map
     tollData.set(tollId, tollRecord);
+    console.log('New toll record data successfully stored.');
+
     return res.status(200).json({ 
       tollId: tollId,
       customerId: tollRecord.customerId,
@@ -93,6 +103,15 @@ const postNewToll = async (req, res) => {
   }
 
 }
+
+catch (error) {
+  console.error(`An error occurred in postNewToll endpoint: ${error.message}`);
+  return res.status(500).json({ error: 'Internal Server Error' });
+}
+
+}
+
+
 module.exports = { tollData, 
   postNewToll,
   locationCodeToName

@@ -1,34 +1,46 @@
-const { tollData}  = require("./postToll");
+const { tollData } = require("./postToll");
 const moment = require('moment-timezone');
 const locationCodeToName = require("./postToll");
 
 locationByTollTagLP = async (req, res) => {
-  const { tollTag, licensePlate } = req.query;
 
-  if (!tollTag && !licensePlate) {
-    return res.status(400).json({ error: 'Either tollTag or licensePlate parameter is required' });
+  try {
+    const { tollTag, licensePlate } = req.query;
+    console.log(`Received GET request for locationByTollTagLP: ${JSON.stringify(req.query)}`);
+
+    if (!tollTag && !licensePlate) {
+      return res.status(400).json({ error: 'Either tollTag or licensePlate parameter is required' });
+    }
+
+
+    const currentDate = moment();
+
+
+    const startDateLastMonth = currentDate.clone().subtract(1, 'months').startOf('month');
+
+    const tollRecordsLastMonth = Array.from(tollData.values()).filter(
+      (record) => {
+        const recordDate = moment(record.timestamp);
+        const matchesTollTag = tollTag && record.tollTag === tollTag;
+        const matchesLicensePlate = licensePlate && record.licensePlate === licensePlate;
+        return (matchesTollTag || matchesLicensePlate) && recordDate.isSameOrAfter(startDateLastMonth) && recordDate.isBefore(currentDate);
+      }
+    );
+
+
+    const locationsLastMonth = tollRecordsLastMonth.map((record) => locationCodeToName.locationCodeToName[record.location]);
+
+    console.log(`Locations passed through last month: ${JSON.stringify(locationsLastMonth)}`);
+
+    res.json({ locationsLastMonth });
   }
 
-  // Get the current date
-  const currentDate = moment();
 
-  // Calculate the start date of the last calendar month
-  const startDateLastMonth = currentDate.clone().subtract(1, 'months').startOf('month');
+  catch {
+    console.error(`An error occurred in locationByTollTagLP endpoint: ${error.message}`);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 
-  // Filter toll records for the last calendar month based on tollTag or licensePlate
-  const tollRecordsLastMonth = Array.from(tollData.values()).filter(
-    (record) => {
-      const recordDate = moment(record.timestamp);
-      const matchesTollTag = tollTag && record.tollTag === tollTag;
-      const matchesLicensePlate = licensePlate && record.licensePlate === licensePlate;
-      return (matchesTollTag || matchesLicensePlate) && recordDate.isSameOrAfter(startDateLastMonth) && recordDate.isBefore(currentDate);
-    }
-  );
-
-  // Map toll bridge locations to full toll bridge names
-  const locationsLastMonth = tollRecordsLastMonth.map((record) => locationCodeToName.locationCodeToName[record.location]);
-
-  res.json({ locationsLastMonth });
 }
 
 
