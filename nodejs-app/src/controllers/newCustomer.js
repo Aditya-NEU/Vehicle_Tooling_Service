@@ -1,15 +1,9 @@
-// Mapping between customer IDs and their details
 const customerData = new Map();
-
 const { v4: uuidv4, stringify } = require('uuid');
-
-// Mapping between license plates and customer IDs
 const licensePlateToCustomerId = new Map();
-
-// Mapping between toll tags and customer IDs
 const tollTagToCustomerId = new Map();
 
-// Generate a unique UUID for the customerc
+
 
 postNewCustomer = async (req, res) => {
 
@@ -34,13 +28,13 @@ postNewCustomer = async (req, res) => {
       })
     }
   
-    // Check if licensePlate and tollTag and name are provided
+
     if (!licensePlate || !tollTag || !name) {
       console.log('Error: License Plate, Toll Tag, and Name are required');
       return res.status(400).json({ error: 'License Plate, Toll Tag and Name are required' });
     }
   
-    // Log customer data before storing
+
     console.log(`Storing new customer data: ${JSON.stringify(customerRecords)}`);
 
     customerData.set(customerId, customerRecords)

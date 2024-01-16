@@ -15,10 +15,9 @@ customerLocationsLastMonth = async (req, res) => {
       return res.status(400).json({ error: 'customerId parameter is required' });
     }
   
-    // Calculate the start date of the last calendar month
+
     const startDateLastMonth = currentDate.clone().subtract(1, 'months').startOf('month');
-  
-    // Filter toll records for the last calendar month based on customerId
+
     const tollRecordsLastMonth = Array.from(tollData.values()).filter(
       (record) => {
         const recordDate = moment(record.timestamp);
@@ -26,8 +25,8 @@ customerLocationsLastMonth = async (req, res) => {
         return matchesCustomerId && recordDate.isSameOrAfter(startDateLastMonth) && recordDate.isBefore(currentDate);
       }
     );
-  
-    // Map toll bridge locations to full toll bridge names
+
+    
     const customerLocationsLastMonth = tollRecordsLastMonth.map((record) => locationCodeToName.locationCodeToName[record.location]);
 
     console.log(`Locations passed through last month by customer ${customerId}: ${JSON.stringify(customerLocationsLastMonth)}`);

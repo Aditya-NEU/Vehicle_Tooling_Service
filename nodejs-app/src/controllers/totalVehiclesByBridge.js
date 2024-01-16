@@ -8,7 +8,6 @@ totalVehiclesByBridge = async (req, res) => {
   try{
     const { bridge, date } = req.query;
 
-    // Check if the date parameter has the correct format
     const validDateFormat = /^\d{4}-\d{2}-\d{2}$/;
     if (!validDateFormat.test(date)) {
       console.log('Error: Invalid date format. It should be in the format "YYYY-MM-DD"');
@@ -29,7 +28,7 @@ totalVehiclesByBridge = async (req, res) => {
     }
   );
 
-  // Map toll bridge location codes to long form names
+
   const tollRecordsWithLongForm = tollRecordsForBridgeAndDate.map((record) => ({
     licensePlate: record.licensePlate,
     tollTag: record.tollTag,

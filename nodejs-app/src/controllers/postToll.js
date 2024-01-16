@@ -22,12 +22,11 @@ try{
 
   console.log(`Received POST request for new toll: ${JSON.stringify(req.body)}`);
 
-    // Check if location is valid
     if (!locationCodeToName[location]) {
       return res.status(400).json({ error: 'Invalid location code' });
     }
 
- // Check if timestamp is in the correct format
+ 
  const isTimestampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
  if (!isTimestampRegex.test(timestamp)) {
    return res.status(400).json({ error: 'Invalid timestamp format. It should be in the format "2023-12-20T00:24:50.888Z"' });
