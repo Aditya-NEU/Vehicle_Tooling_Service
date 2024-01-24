@@ -1,0 +1,1 @@
+const amd =4;
